@@ -1,0 +1,7 @@
+Many similiar words can be grouped together like [woman, female, male],
+[sweet, tea, coffee], [amazing, wonderful, boring, great]
+
+I am surprised that king is so far from man and queen.
+
+There is also a strong similarity between queen and dumb. That is probably just a 
+factor of how those words are used in this particular text.
