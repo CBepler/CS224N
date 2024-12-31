@@ -33,6 +33,10 @@ class PartialParse(object):
         ### Note: If you need to use the sentence object to initialize anything, make sure to not directly 
         ###       reference the sentence object.  That is, remember to NOT modify the sentence object. 
 
+        self.stack = ["ROOT"]
+        self.buffer = sentence.copy()
+        self.dependencies = []
+
 
         ### END YOUR CODE
 
@@ -52,6 +56,17 @@ class PartialParse(object):
         ###         2. Left Arc
         ###         3. Right Arc
 
+        if transition == "S":
+            self.stack.append(self.buffer[0])
+            del self.buffer[0]
+        elif transition == "LA":
+            dependency = (self.stack[-1], self.stack[-2])
+            del self.stack[-2]
+            self.dependencies.append(dependency)
+        elif transition == "RA":
+            dependency = (self.stack[-2], self.stack[-1])
+            del self.stack[-1]
+            self.dependencies.append(dependency)
 
         ### END YOUR CODE
 
@@ -171,7 +186,7 @@ class DummyModel(object):
         """First shifts everything onto the stack and then does exclusively right arcs if the first word of
         the sentence is "right", "left" if otherwise.
         """
-        return [("RA" if pp.stack[1] is "right" else "LA") if len(pp.buffer) == 0 else "S"
+        return [("RA" if pp.stack[1] == "right" else "LA") if len(pp.buffer) == 0 else "S"
                 for pp in partial_parses]
 
     def interleave_predict(self, partial_parses):
