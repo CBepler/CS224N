@@ -189,7 +189,21 @@ class NMT(nn.Module):
         ###     Tensor Reshape (a possible alternative to permute):
         ###         https://pytorch.org/docs/stable/generated/torch.Tensor.reshape.html
 
-        
+        X = self.model_embeddings.source(source_padded)
+        X = torch.permute(X, (1, 2, 0))
+        X = self.post_embed_cnn(X)
+        X = torch.permute(X, (2, 0, 1))
+        X = nn.utils.rnn.pack_padded_sequence(X, source_lengths, enforce_sorted=True)
+        enc_hiddens, (last_hidden, last_cell) = self.encoder(X)
+        enc_hiddens, _ = nn.utils.rnn.pad_packed_sequence(enc_hiddens)
+        enc_hiddens = torch.permute(enc_hiddens, (1, 0, 2))
+        last_hidden = torch.cat((last_hidden[0], last_hidden[1]), dim=1)
+        init_decoder_hidden = self.h_projection(last_hidden)
+        last_cell = torch.cat((last_cell[0], last_cell[1]), dim=1)
+        init_decoder_cell = self.c_projection(last_cell)
+        dec_init_state = (init_decoder_hidden, init_decoder_cell)
+
+
 
 
         ### END YOUR CODE
