@@ -20,6 +20,7 @@ import torch.nn.functional as F
 import nltk
 import sentencepiece as spm
 nltk.download('punkt')
+nltk.download('punkt_tab')
 
 
 def pad_sents(sents, pad_token):
