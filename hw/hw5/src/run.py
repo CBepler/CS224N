@@ -68,7 +68,11 @@ if args.variant == 'vanilla':
     model.to(device)
 elif args.variant == 'perceiver':
     # set mconf.perceiver, and mconf.bottleneck_dim parameters appropriately.
-    pass # [part g] Make some other model here
+    mconf.perceiver = True
+    mconf.bottleneck_dim = args.bottleneck_dim
+    model = model.GPT(mconf)
+    model.to(device)
+    # [part g] Make some other model here
 else:
     raise ValueError("Unknown model variant")
 
@@ -93,7 +97,10 @@ if args.function == 'pretrain':
     # final_tokens=200*len(pretrain_dataset)*block_size
     # num_workers=4
     # writer=writer 
-    raise NotImplementedError
+    tConf = trainer.TrainerConfig(max_epochs=650, batch_size=128, learning_rate=args.pretrain_lr, lr_decay=True, warmup_tokens=512*20, final_tokens=200*len(pretrain_dataset)*block_size, num_workers=4, writer=writer)
+    trainer = trainer.Trainer(model, pretrain_dataset, None, tConf)
+    trainer.train()
+    torch.save(model.state_dict(), args.writing_params_path)
 elif args.function == 'finetune':
     assert args.writing_params_path is not None
     assert args.finetune_corpus_path is not None

@@ -89,8 +89,18 @@ class DownProjectBlock(nn.Module):
     def __init__(self, config):
         super().__init__()
         ### YOUR CODE HERE
+        self.ln1 = nn.LayerNorm(config.n_embd)
+        self.ln2 = nn.LayerNorm(config.n_embd)
+        self.attn = attention.CausalCrossAttention(config)
+        self.mlp = nn.Sequential(
+            nn.Linear(config.n_embd, 4 * config.n_embd),
+            nn.GELU(),
+            nn.Linear(4 * config.n_embd, config.n_embd),
+            nn.Dropout(config.resid_pdrop),
+        )
+        self.C = nn.Parameter(torch.empty(1, config.bottleneck_dim, config.n_embd))
+        nn.init.xavier_uniform_(self.C) 
         ### Hint: Copy over the code from Block and make necessary modifications.
-        pass
         ### END YOUR CODE
 
     def forward(self, x_input):
@@ -98,9 +108,11 @@ class DownProjectBlock(nn.Module):
         Use the layernorm layers on C, and then on the input to the MLP.
         """
         ### YOUR CODE HERE
+        x = self.attn(self.ln1(x_input), self.ln1(self.C))
+        x = x + self.mlp(self.ln2(x))
+        return x
         ### Hint: Copy over the code from Block and make necessary modifications.
         ### Should be around 3-5 lines.
-        pass
         ### END YOUR CODE
     
     
@@ -114,8 +126,16 @@ class UpProjectBlock(nn.Module):
     def __init__(self, config):
         super().__init__()
         ### YOUR CODE HERE
+        self.ln1 = nn.LayerNorm(config.n_embd)
+        self.ln2 = nn.LayerNorm(config.n_embd)
+        self.attn = attention.CausalCrossAttention(config)
+        self.mlp = nn.Sequential(
+            nn.Linear(config.n_embd, 4 * config.n_embd),
+            nn.GELU(),
+            nn.Linear(4 * config.n_embd, config.n_embd),
+            nn.Dropout(config.resid_pdrop),
+        )
         ### Hint: Copy over the code from Block and make necessary modifications.
-        pass
         ### END YOUR CODE
     
     def forward(self, y, x_input):
@@ -124,9 +144,11 @@ class UpProjectBlock(nn.Module):
         Use the layernorm layers on y, and then on the input to the MLP.
         """
         ### YOUR CODE HERE
+        x = self.attn(self.ln1(y), self.ln1(x_input))
+        x = x + self.mlp(self.ln2(x))
+        return x
         ### Hint: Copy over the code from Block and make necessary modifications.
         ### Should be around 3-5 lines.
-        pass
         ### END YOUR CODE
     
 
