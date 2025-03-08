@@ -7,3 +7,7 @@ hw/hw4/student/__pycache__/vocab.cpython-38.pyc
 hw/hw4/student/outputs/test_outputs.txt
 hw/hw4/student/runs/nmt/events.out.tfevents.1736630080.fedora.45532.0
 hw/hw4/student/runs/nmt_local/events.out.tfevents.1736611709.fedora.16056.0
+*.pyc
+hw/hw5/expt/*
+*.params
+*.predictions
